@@ -1,64 +1,68 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
     <View style={styles.container}>
       <Tabs
-        screenOptions={{
+        screenOptions={({ route }) => ({
           headerShown: false,
-          tabBarShowLabel: true, // Enable labels for tabs
-          tabBarStyle: [styles.tabBar, { backgroundColor: '#1054CF' }], // Change background color to #1054CF
-          tabBarLabelStyle: styles.tabBarLabel, // Style for labels
-          tabBarIconStyle: styles.tabBarIcon, // Adjust icon position
-          tabBarActiveTintColor: '#FFFFFF', // White color for selected icons and labels
-          tabBarInactiveTintColor: '#ccc', // Gray color for unselected icons and labels
-        }}
+          tabBarShowLabel: false, // disable default label
+          tabBarStyle: styles.tabBar,
+          tabBarActiveTintColor: '#FFFFFF',
+          tabBarInactiveTintColor: '#ccc',
+          tabBarButton: (props) => (
+            <CustomTabBarButton {...props} routeName={route.name} />
+          ),
+        })}
       >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
-            ),
-            tabBarLabel: 'Home',
-          }}
-        />
-        <Tabs.Screen
-          name="rent"
-          options={{
-            title: 'Rent',
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={focused ? 'car' : 'car-outline'} size={24} color={color} />
-            ),
-            tabBarLabel: 'Rental',
-          }}
-        />
-        <Tabs.Screen
-          name="chats"
-          options={{
-            title: 'Chats',
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={focused ? 'chatbubbles' : 'chatbubbles-outline'} size={24} color={color} />
-            ),
-            tabBarLabel: 'Chats',
-          }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: 'Profile',
-            tabBarIcon: ({ color, focused }) => (
-              <FontAwesome5 name={focused ? 'user-alt' : 'user'} size={20} color={color} />
-            ),
-            tabBarLabel: 'Profile',
-          }}
-        />
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="rent" />
+        <Tabs.Screen name="chats" />
+        <Tabs.Screen name="profile" />
       </Tabs>
     </View>
+  );
+}
+
+function CustomTabBarButton({ accessibilityState, children, onPress, routeName }) {
+  const focused = accessibilityState.selected;
+  const color = focused ? '#FFFFFF' : '#ccc';
+
+  const iconSize = 24;
+  let iconComponent = null;
+  let label = '';
+
+  switch (routeName) {
+    case 'index':
+      iconComponent = <Ionicons name={focused ? 'home' : 'home-outline'} size={iconSize} color={color} />;
+      label = 'Home';
+      break;
+    case 'rent':
+      iconComponent = <Ionicons name={focused ? 'car' : 'car-outline'} size={iconSize} color={color} />;
+      label = 'Rental';
+      break;
+    case 'chats':
+      iconComponent = <Ionicons name={focused ? 'chatbubbles' : 'chatbubbles-outline'} size={iconSize} color={color} />;
+      label = 'Chats';
+      break;
+    case 'profile':
+      iconComponent = <FontAwesome5 name={focused ? 'user-alt' : 'user'} size={20} color={color} />;
+      label = 'Profile';
+      break;
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.tabButton}
+      activeOpacity={0.7}
+    >
+      {iconComponent}
+      <Text style={[styles.tabLabel, { color }]}>{label}</Text>
+    </TouchableOpacity>
   );
 }
 
@@ -72,9 +76,9 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
-    height: 70, // Adjusted height for better spacing
+    height: 70,
     borderRadius: 30,
-    backgroundColor: '#1054CF', // Updated background color
+    backgroundColor: '#1054CF',
     borderTopWidth: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -82,18 +86,15 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 10,
     paddingHorizontal: 10,
-    paddingTop: 5, // Added top padding
+    paddingTop: 5,
   },
-  tabBarIcon: {
-    flexDirection: 'column', // Stack icon and label vertically
-    alignItems: 'center', // Center the icon and label horizontally
-    justifyContent: 'center', // Center the content vertically
-    marginBottom: 0, // Remove extra spacing
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  tabBarLabel: {
-    fontSize: 12, // Font size for labels
-    color: '#ccc', // Same shade as the icon
-    textAlign: 'center', // Center-align the label
-    marginTop: 4, // Add spacing between the icon and the label
+  tabLabel: {
+    fontSize: 12,
+    marginTop: 4,
   },
 });

@@ -1,7 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
-
+import { StyleSheet, View } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
 export default function TabLayout() {
@@ -10,8 +9,12 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarShowLabel: false,
-          tabBarStyle: styles.tabBar,
+          tabBarShowLabel: true, // Enable labels for tabs
+          tabBarStyle: [styles.tabBar, { backgroundColor: '#1054CF' }], // Change background color to #1054CF
+          tabBarLabelStyle: styles.tabBarLabel, // Style for labels
+          tabBarIconStyle: styles.tabBarIcon, // Adjust icon position
+          tabBarActiveTintColor: '#FFFFFF', // White color for selected icons and labels
+          tabBarInactiveTintColor: '#ccc', // Gray color for unselected icons and labels
         }}
       >
         <Tabs.Screen
@@ -21,6 +24,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
             ),
+            tabBarLabel: 'Home',
           }}
         />
         <Tabs.Screen
@@ -30,6 +34,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons name={focused ? 'car' : 'car-outline'} size={24} color={color} />
             ),
+            tabBarLabel: 'Rental',
           }}
         />
         <Tabs.Screen
@@ -39,6 +44,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons name={focused ? 'chatbubbles' : 'chatbubbles-outline'} size={24} color={color} />
             ),
+            tabBarLabel: 'Chats',
           }}
         />
         <Tabs.Screen
@@ -48,6 +54,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <FontAwesome5 name={focused ? 'user-alt' : 'user'} size={20} color={color} />
             ),
+            tabBarLabel: 'Profile',
           }}
         />
       </Tabs>
@@ -65,9 +72,9 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
-    height: 70,
+    height: 70, // Adjusted height for better spacing
     borderRadius: 30,
-    backgroundColor: '#2A2C36',
+    backgroundColor: '#1054CF', // Updated background color
     borderTopWidth: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -75,5 +82,18 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 10,
     paddingHorizontal: 10,
+    paddingTop: 5, // Added top padding
+  },
+  tabBarIcon: {
+    flexDirection: 'column', // Stack icon and label vertically
+    alignItems: 'center', // Center the icon and label horizontally
+    justifyContent: 'center', // Center the content vertically
+    marginBottom: 0, // Remove extra spacing
+  },
+  tabBarLabel: {
+    fontSize: 12, // Font size for labels
+    color: '#ccc', // Same shade as the icon
+    textAlign: 'center', // Center-align the label
+    marginTop: 4, // Add spacing between the icon and the label
   },
 });

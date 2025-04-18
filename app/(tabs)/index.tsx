@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput, FlatList, SafeAreaView } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { Dimensions } from 'react-native';
 const teslaCybertruckImage = require('./teslacybertruck.png');
@@ -96,179 +96,184 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View>
-        <View style={styles.backgroundDesign} />
-        <View style={styles.header}>
-          <View style={styles.userInfo}>
-            <Text style={styles.locationLabel}>Location</Text>
-            <Text style={styles.locationValue}>PH, Davao City</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        {/* Header */}
+        <View>
+          <View style={styles.backgroundDesign} />
+          <View style={styles.header}>
+            <View style={styles.userInfo}>
+              <Text style={styles.locationLabel}>Location</Text>
+              <Text style={styles.locationValue}>PH, Davao City</Text>
+            </View>
+            <View style={styles.icons}>
+              <TouchableOpacity>
+                <Ionicons name="notifications" size={24} color="#1054CF" />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Ionicons name="heart" size={24} color="#1054CF" />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.icons}>
-            <TouchableOpacity>
-              <Ionicons name="notifications" size={24} color="#1054CF" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Ionicons name="heart" size={24} color="#1054CF" />
+          {/* Search bar */}
+          <View style={styles.searchSection}>
+            <TextInput
+              placeholder="Search cars..."
+              placeholderTextColor="#ccc"
+              style={styles.searchInput}
+              value={searchQuery}
+              onChangeText={handleSearch} // Call handleSearch on input change
+            />
+            <TouchableOpacity style={styles.filterButton}>
+              <Ionicons name="filter" size={20} color="white" />
             </TouchableOpacity>
           </View>
-        </View>
-        {/* Search bar */}
-        <View style={styles.searchSection}>
-          <TextInput
-            placeholder="Search cars..."
-            placeholderTextColor="#ccc"
-            style={styles.searchInput}
-            value={searchQuery}
-            onChangeText={handleSearch} // Call handleSearch on input change
-          />
-          <TouchableOpacity style={styles.filterButton}>
-            <Ionicons name="filter" size={20} color="white" />
-          </TouchableOpacity>
-        </View>
 
-        {/* Suggestions */}
-        {suggestions.length > 0 && (
-          <View style={styles.suggestionsContainer}>
-            {suggestions.map((car) => (
+          {/* Suggestions */}
+          {suggestions.length > 0 && (
+            <View style={styles.suggestionsContainer}>
+              {suggestions.map((car) => (
+                <TouchableOpacity
+                  key={car.id}
+                  style={styles.suggestionItem}
+                  onPress={() => {
+                    setSearchQuery(car.model); // Set the search query to the selected suggestion
+                    setSuggestions([]); // Clear suggestions
+                  }}
+                >
+                  <Text style={styles.suggestionText}>{`${car.brand} ${car.model}`}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+        {/* Special Offers */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Special Offers</Text>
+          <FlatList
+            data={[{ id: 1 }, { id: 2 }, { id: 3 }]} // Replace with actual coupon data
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View style={styles.couponCard}>
+                <Image source={couponImage} style={styles.couponImage} />
+              </View>
+            )}
+            onScroll={(event) => {
+              const index = Math.round(event.nativeEvent.contentOffset.x / Dimensions.get('window').width);
+              setCurrentIndex(index);
+            }}
+          />
+          {/* Item Indicator */}
+          <View style={styles.indicatorContainer}>
+            {[1, 2, 3].map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.indicator,
+                  currentIndex === index && styles.activeIndicator,
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+        {/* Car Brands */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Car Brands</Text>
+          <View style={styles.brandGrid}>
+            {[
+              { name: 'tesla', logo: teslaLogo },
+              { name: 'toyota', logo: toyotaLogo },
+              { name: 'bmw', logo: bmwLogo },
+              { name: 'honda', logo: hondaLogo },
+              { name: 'mitsubishi', logo: mitsubishiLogo },
+              { name: 'bugatti', logo: bugattiLogo },
+              { name: 'volvo', logo: volvoLogo },
+              { name: 'more', logo: null }, // Add "More" circle
+            ].map((brand, index) => (
               <TouchableOpacity
-                key={car.id}
-                style={styles.suggestionItem}
+                key={index}
+                style={styles.brandCircle}
                 onPress={() => {
-                  setSearchQuery(car.model); // Set the search query to the selected suggestion
-                  setSuggestions([]); // Clear suggestions
+                  if (brand.name === 'more') {
+                    // Scroll to the "Top Deals" section
+                    const topDealsSection = document.getElementById('top-deals');
+                    if (topDealsSection) {
+                      topDealsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }
                 }}
               >
-                <Text style={styles.suggestionText}>{`${car.brand} ${car.model}`}</Text>
+                {brand.logo ? (
+                  <Image source={brand.logo} style={styles.brandLogo} />
+                ) : (
+                  <Text style={styles.brandText}>More</Text> // Display "More" text
+                )}
               </TouchableOpacity>
             ))}
           </View>
-        )}
-      </View>
-      {/* Special Offers */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Special Offers</Text>
-        <FlatList
-          data={[{ id: 1 }, { id: 2 }, { id: 3 }]} // Replace with actual coupon data
-          keyExtractor={(item) => item.id.toString()}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View style={styles.couponCard}>
-              <Image source={couponImage} style={styles.couponImage} />
-            </View>
-          )}
-          onScroll={(event) => {
-            const index = Math.round(event.nativeEvent.contentOffset.x / Dimensions.get('window').width);
-            setCurrentIndex(index);
-          }}
-        />
-        {/* Item Indicator */}
-        <View style={styles.indicatorContainer}>
-          {[1, 2, 3].map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.indicator,
-                currentIndex === index && styles.activeIndicator,
-              ]}
-            />
-          ))}
         </View>
-      </View>
-      {/* Car Brands */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Car Brands</Text>
-        <View style={styles.brandGrid}>
-          {[
-            { name: 'tesla', logo: teslaLogo },
-            { name: 'toyota', logo: toyotaLogo },
-            { name: 'bmw', logo: bmwLogo },
-            { name: 'honda', logo: hondaLogo },
-            { name: 'mitsubishi', logo: mitsubishiLogo },
-            { name: 'bugatti', logo: bugattiLogo },
-            { name: 'volvo', logo: volvoLogo },
-            { name: 'more', logo: null }, // Add "More" circle
-          ].map((brand, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.brandCircle}
-              onPress={() => {
-                if (brand.name === 'more') {
-                  // Scroll to the "Top Deals" section
-                  const topDealsSection = document.getElementById('top-deals');
-                  if (topDealsSection) {
-                    topDealsSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }
-              }}
-            >
-              {brand.logo ? (
-                <Image source={brand.logo} style={styles.brandLogo} />
-              ) : (
-                <Text style={styles.brandText}>More</Text> // Display "More" text
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-      {/* Top Deals */}
-      <View id="top-deals" style={styles.section}>
-        <Text style={styles.sectionTitle}>Top Deals</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
-          {['All', 'Jeep','Audi','Mercedes', 'Tesla', 'BMW', 'Toyota', 'Volvo', 'Bugatti', 'Honda'].map((cat, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={[
-                styles.categoryButton,
-                selectedCategory === cat && { backgroundColor: '#FFB700' }, // Highlight selected category
-              ]}
-              onPress={() => setSelectedCategory(cat)}
-            >
-              <Text style={styles.categoryText}>{cat}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        <View style={styles.cardContainer}>
-          {filteredCars.map((car) => (
-            <View key={car.id} style={styles.carCard}>
-              <View style={styles.cardHeader}>
-                <FontAwesome5 name={car.brand} size={20} color="white" />
-                <Ionicons name="heart-outline" size={20} color="white" />
-              </View>
-              <Image source={car.image} style={styles.carImage} />
-              <Text style={styles.carModel}>{car.model}</Text>
-              <Text style={styles.carPrice}>{car.price}</Text>
-              <Text style={styles.carRating}>
-                ⭐ {car.rating}
-                <View style={styles.carLabelContainer}>
-                  <Text style={styles.carLabel}>{car.isNew ? 'NEW' : 'USED'}</Text>
+        {/* Top Deals */}
+        <View id="top-deals" style={styles.section}>
+          <Text style={styles.sectionTitle}>Top Deals</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
+            {['All', 'Jeep','Audi','Mercedes', 'Tesla', 'BMW', 'Toyota', 'Volvo', 'Bugatti', 'Honda'].map((cat, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={[
+                  styles.categoryButton,
+                  selectedCategory === cat && { backgroundColor: '#FFB700' }, // Highlight selected category
+                ]}
+                onPress={() => setSelectedCategory(cat)}
+              >
+                <Text style={styles.categoryText}>{cat}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <View style={styles.cardContainer}>
+            {filteredCars.map((car) => (
+              <View key={car.id} style={styles.carCard}>
+                <View style={styles.cardHeader}>
+                  <FontAwesome5 name={car.brand} size={20} color="white" />
+                  <Ionicons name="heart-outline" size={20} color="white" />
                 </View>
-              </Text>
-              {/* Buttons */}
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={[styles.button, styles.chatButton]} onPress={handleChat}>
-                  <Text style={styles.chatButtonText}>Chat</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.button, styles.viewInfoButton]} onPress={handleViewInfo}>
-                  <Text style={styles.viewInfoButtonText}>View Info</Text>
-                </TouchableOpacity>
+                <Image source={car.image} style={styles.carImage} />
+                <Text style={styles.carPrice}>{car.price}</Text>
+                <Text style={styles.carModel}>{car.model}</Text>
+                <Text style={styles.carRating}>
+                  ⭐ {car.rating}
+                  <View style={styles.carLabelContainer}>
+                    <Text style={styles.carLabel}>{car.isNew ? 'NEW' : 'USED'}</Text>
+                  </View>
+                </Text>
+                {/* Buttons */}
+                <View style={styles.buttonsContainer}>
+                  <TouchableOpacity style={[styles.button, styles.detailsButton]} onPress={handleViewInfo}>
+                    <Text style={styles.detailsButtonText}>View Info</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.button, styles.rentNowButton]} onPress={handleViewInfo}>
+                    <Text style={styles.rentNowButtonText}>Rent Now</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#ededed',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     padding: 16,
   },
   backgroundDesign: {
@@ -339,44 +344,61 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   couponCard: {
-    width: Dimensions.get('window').width * 0.9, // 90% of the screen width
+    width: Dimensions.get('window').width - 32, // Full width minus padding
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16, // Keep the rounded corners
-    padding: 8, // Add padding inside the card
-    marginHorizontal: Dimensions.get('window').width * 0.05, // Center the card horizontally
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    position: 'relative', // Add this to make it a positioning context
   },
   couponImage: {
-    width: '100%', 
-    height: Dimensions.get('window').width * 0.45, 
-    borderRadius: 16,
+    width: '100%',
+    height: Dimensions.get('window').width * 0.6, // 60% of screen width for better aspect ratio
+    borderRadius: 12,
+    resizeMode: 'cover',
   },
   brandGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap', 
-    justifyContent: 'space-between', 
-    rowGap: 10, 
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 20,
+    columnGap: 5,
+    paddingHorizontal: 8,
+    marginTop: 8,
   },
   brandCircle: {
-    width: (screenWidth - 64) / 4, // Adjust width for 4 items per row
-    height: (screenWidth - 64) / 4, // Make it a square
-    backgroundColor: '#ffffff', // White background
-    borderWidth: 2, // Border width
-    borderColor: 'grey', // Border color
-    borderRadius: 12, // Rounded edges
-    justifyContent: 'center', // Center content vertically
-    alignItems: 'center', // Center content horizontally
-    marginBottom: 10, // Spacing between squares
+    width: (screenWidth - 64) / 4,
+    height: (screenWidth - 64) / 4,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   brandText: {
-    color: 'BLACK', // White text
-    fontSize: 12, // Adjusted font size for smaller circles
-    textTransform: 'capitalize', // Capitalize the text
+    color: '#333333',
+    fontSize: 12,
+    fontWeight: '500',
+    textTransform: 'capitalize',
   },
   brandLogo: {
-    width: '70%', // Adjust the size of the logo
-    height: '70%', // Maintain aspect ratio
-    resizeMode: 'contain', // Ensure the logo scales properly
+    width: '60%',
+    height: '60%',
+    resizeMode: 'contain',
   },
   categoryButton: {
     paddingHorizontal: 12,
@@ -400,34 +422,39 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 12,
     marginBottom: 16,
+    height: 320, // Fixed height to prevent stretching
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 8, // Add some spacing
   },
   carImage: {
-    width: '110%', // Slightly larger than the card width
-    height: 200, // Increased height for a larger image
-    resizeMode: 'contain', // Ensure the image scales properly
+    width: '100%',
+    height: 140, // Fixed height for the image
+    resizeMode: 'contain',
     marginVertical: 8,
-    alignSelf: 'center', // Center the image within the card
+    alignSelf: 'center',
   },
   carModel: {
     color: 'white',
-    fontSize: 20, // Bigger font size for H1
-    fontWeight: 'bold', // Bold text
-    textAlign: 'left', // Align to the left
+    fontSize: 16, // Slightly smaller font
+    fontWeight: 'bold',
+    textAlign: 'left',
+    marginBottom: 4, // Add spacing
   },
   carPrice: {
     color: '#FFB700',
-    fontSize: 18, // Slightly bigger font size for H2
-    fontWeight: 'bold', // Bold text
-    textAlign: 'right', // Align to the right
+    fontSize: 16, // Slightly smaller font
+    fontWeight: 'bold',
+    textAlign: 'right',
+    marginBottom: 4, // Add spacing
   },
   carRating: {
     color: '#ccc',
     fontSize: 12,
     textAlign: 'left',
+    marginBottom: 8, // Add spacing
   },
   carRatingLabel: {
     color: '#ccc',
@@ -438,7 +465,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 'auto', // Push buttons to bottom
   },
   button: {
     paddingVertical: 8,
@@ -446,23 +473,23 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: '48%',
   },
-  chatButton: {
-    backgroundColor: 'transparent', // Transparent background
-    borderColor: '#ffffff', // Blue border
+  detailsButton: {
+    backgroundColor: 'transparent',
+    borderColor: '#ffffff',
     borderWidth: 1,
   },
-  chatButtonText: {
-    color: '#ffffff', // Blue text
-    fontWeight: 'bold', // Bold text
+  detailsButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 14,
   },
-  viewInfoButton: {
-    backgroundColor: '#FFFFFF',
+  rentNowButton: {
+    backgroundColor: '#FFB700',
   },
-  viewInfoButtonText: {
-    color: '#1054CF',
-    fontWeight: 'bold', // Bold text
+  rentNowButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 14,
   },
@@ -481,19 +508,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', // Bold text
   },
   indicatorContainer: {
+    position: 'absolute',
+    bottom: 16, // Position at the bottom of the coupon card
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 10,
+    alignItems: 'center',
+    paddingVertical: 8,
   },
   indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ccc',
-    marginHorizontal: 4,
+    width: Math.min(10, Dimensions.get('window').width * 0.02),
+    height: Math.min(10, Dimensions.get('window').width * 0.02),
+    borderRadius: Math.min(5, Dimensions.get('window').width * 0.01),
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: Math.min(6, Dimensions.get('window').width * 0.015),
   },
   activeIndicator: {
-    backgroundColor: '#007BFF', // Active indicator color
+    backgroundColor: '#FFB700',
+    width: Math.min(20, Dimensions.get('window').width * 0.05),
   },
   suggestionsContainer: {
     backgroundColor: '#fff',

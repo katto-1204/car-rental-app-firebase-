@@ -11,7 +11,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarShowLabel: false, // disable default label
           tabBarStyle: styles.tabBar,
-          tabBarActiveTintColor: '#FFFFFF',
+          tabBarActiveTintColor: '#FFB700', // Changed from '#FFFFFF' to yellow
           tabBarInactiveTintColor: '#ccc',
           tabBarButton: (props) => (
             <CustomTabBarButton {...props} routeName={route.name} />
@@ -29,7 +29,7 @@ export default function TabLayout() {
 
 function CustomTabBarButton({ accessibilityState, children, onPress, routeName }) {
   const focused = accessibilityState.selected;
-  const color = focused ? '#FFFFFF' : '#ccc';
+  const color = focused ? '#FFB700' : '#ccc'; // Changed from '#FFFFFF' to yellow
 
   const iconSize = 24;
   let iconComponent = null;

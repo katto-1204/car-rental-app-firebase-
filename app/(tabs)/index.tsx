@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput, FlatList, SafeAreaView } from 'react-native';
 import { Ionicons, FontAwesome5, FontAwesome } from '@expo/vector-icons'; // Updated import to include FontAwesome
 import { Dimensions } from 'react-native';
+import { useRouter } from 'expo-router'; // Added import for useRouter
 const teslaCybertruckImage = require('./teslacybertruck.png');
 const nissan370zImage = require('./nissan370z.png');
 const userImage = require('./user.png');
@@ -16,51 +17,52 @@ const volvoLogo = require('../brandlogos/volvo-logo.png');
 
 const cars = [
   // All Cars
-  { id: 1, brand: 'Tesla', model: 'Tesla Cybertruck', price: '$120/day', rating: 4.9, seats: 6, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 2, brand: 'Nissan', model: 'Nissan 370Z', price: '$100/day', rating: 4.7, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 3, brand: 'Jeep', model: 'Jeep Wrangler', price: '$150/day', rating: 4.8, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 4, brand: 'Toyota', model: 'Toyota Innova', price: '$90/day', rating: 4.6, seats: 7, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 5, brand: 'Tesla', model: 'Tesla Model 3', price: '$130/day', rating: 4.9, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 6, brand: 'Audi', model: 'Audi Q5', price: '$140/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 7, brand: 'Toyota', model: 'GR Supra', price: '$110/day', rating: 4.8, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 1, brand: 'Tesla', model: 'Tesla Cybertruck', price: '6.5k/day', rating: 4.9, seats: 6, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 2, brand: 'Nissan', model: 'Nissan 370Z', price: '₱850/day', rating: 4.7, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 3, brand: 'Jeep', model: 'Jeep Wrangler', price: '2.5k/day', rating: 4.8, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 4, brand: 'Toyota', model: 'Toyota Innova', price: '₱750/day', rating: 4.6, seats: 7, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 5, brand: 'Tesla', model: 'Tesla Model 3', price: '7.2k/day', rating: 4.9, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 6, brand: 'Audi', model: 'Audi Q5', price: '4.8k/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 7, brand: 'Toyota', model: 'GR Supra', price: '3.2k/day', rating: 4.8, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
 
   // Mercedes
-  { id: 8, brand: 'Mercedes', model: 'Mercedes A-Class', price: '$100/day', rating: 4.5, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 9, brand: 'Mercedes', model: 'Mercedes C-Class', price: '$120/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 10, brand: 'Mercedes', model: 'Mercedes E-Class', price: '$150/day', rating: 4.8, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 8, brand: 'Mercedes', model: 'Mercedes A-Class', price: '5.5k/day', rating: 4.5, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 9, brand: 'Mercedes', model: 'Mercedes C-Class', price: '6.8k/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 10, brand: 'Mercedes', model: 'Mercedes E-Class', price: '8.5k/day', rating: 4.8, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
 
   // Tesla
-  { id: 11, brand: 'Tesla', model: 'Tesla Model S', price: '$140/day', rating: 4.9, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 12, brand: 'Tesla', model: 'Tesla Model X', price: '$160/day', rating: 4.8, seats: 7, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 13, brand: 'Tesla', model: 'Tesla Roadster', price: '$200/day', rating: 5.0, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 11, brand: 'Tesla', model: 'Tesla Model S', price: '7.8k/day', rating: 4.9, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 12, brand: 'Tesla', model: 'Tesla Model X', price: '8.9k/day', rating: 4.8, seats: 7, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 13, brand: 'Tesla', model: 'Tesla Roadster', price: '12k/day', rating: 5.0, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
 
   // BMW
-  { id: 14, brand: 'BMW', model: 'BMW X5', price: '$130/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 15, brand: 'BMW', model: 'BMW 3 Series', price: '$110/day', rating: 4.6, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 16, brand: 'BMW', model: 'BMW 7 Series', price: '$180/day', rating: 4.9, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 14, brand: 'BMW', model: 'BMW X5', price: '7.2k/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 15, brand: 'BMW', model: 'BMW 3 Series', price: '6.1k/day', rating: 4.6, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 16, brand: 'BMW', model: 'BMW 7 Series', price: '9.5k/day', rating: 4.9, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
 
   // Toyota
-  { id: 17, brand: 'Toyota', model: 'Toyota Corolla', price: '$80/day', rating: 4.5, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 18, brand: 'Toyota', model: 'Toyota Camry', price: '$100/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 19, brand: 'Toyota', model: 'Toyota RAV4', price: '$120/day', rating: 4.8, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 17, brand: 'Toyota', model: 'Toyota Corolla', price: '₱650/day', rating: 4.5, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 18, brand: 'Toyota', model: 'Toyota Camry', price: '₱850/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 19, brand: 'Toyota', model: 'Toyota RAV4', price: '2.2k/day', rating: 4.8, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
 
   // Volvo
-  { id: 20, brand: 'Volvo', model: 'Volvo XC90', price: '$150/day', rating: 4.8, seats: 7, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 21, brand: 'Volvo', model: 'Volvo S60', price: '$110/day', rating: 4.6, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 22, brand: 'Volvo', model: 'Volvo V60', price: '$130/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 20, brand: 'Volvo', model: 'Volvo XC90', price: '8.3k/day', rating: 4.8, seats: 7, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 21, brand: 'Volvo', model: 'Volvo S60', price: '6.1k/day', rating: 4.6, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 22, brand: 'Volvo', model: 'Volvo V60', price: '7.2k/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
 
   // Bugatti
-  { id: 23, brand: 'Bugatti', model: 'Bugatti Chiron', price: '$1000/day', rating: 5.0, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 24, brand: 'Bugatti', model: 'Bugatti Veyron', price: '$900/day', rating: 4.9, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 25, brand: 'Bugatti', model: 'Bugatti Divo', price: '$1100/day', rating: 5.0, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 23, brand: 'Bugatti', model: 'Bugatti Chiron', price: '55k/day', rating: 5.0, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 24, brand: 'Bugatti', model: 'Bugatti Veyron', price: '50k/day', rating: 4.9, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 25, brand: 'Bugatti', model: 'Bugatti Divo', price: '60k/day', rating: 5.0, seats: 2, image: { uri: 'https://placehold.co/300x200' } },
 
   // Honda
-  { id: 26, brand: 'Honda', model: 'Honda Civic', price: '$70/day', rating: 4.5, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 27, brand: 'Honda', model: 'Honda Accord', price: '$90/day', rating: 4.6, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
-  { id: 28, brand: 'Honda', model: 'Honda CR-V', price: '$100/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 26, brand: 'Honda', model: 'Honda Civic', price: '₱580/day', rating: 4.5, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 27, brand: 'Honda', model: 'Honda Accord', price: '₱750/day', rating: 4.6, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
+  { id: 28, brand: 'Honda', model: 'Honda CR-V', price: '₱850/day', rating: 4.7, seats: 5, image: { uri: 'https://placehold.co/300x200' } },
 ];
 const username = "Luis"; // Replace with actual Firebase user's name later
 export default function HomeScreen({ navigation }) {
+  const router = useRouter(); // Added useRouter hook
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('All'); // Default to "All"
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,8 +76,19 @@ export default function HomeScreen({ navigation }) {
   const handleChat = () => {
     navigation.navigate('Chat');
   };
-  const handleViewInfo = () => {
-    navigation.navigate('CarDetails');
+
+  const handleViewInfo = (car) => {
+    router.push({
+      pathname: "/cardetails",
+      params: { 
+        id: car.id,
+        brand: car.brand,
+        model: car.model,
+        price: car.price,
+        rating: car.rating,
+        seats: car.seats
+      }
+    });
   };
 
   const handleSearch = (query) => {
@@ -241,39 +254,38 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.cardContainer}>
             {filteredCars.map((car) => (
               <View key={car.id} style={styles.carCard}>
-                <View style={styles.cardHeader}>
-                  <View style={styles.locationContainer}>
-                    <FontAwesome name="map-marker" size={16} color="#ccc" />
-                    <Text style={styles.locationText}>Davao City</Text>
+                <View style={styles.cardContent}>
+                  <View style={styles.cardHeader}>
+                    <View style={styles.locationContainer}>
+                      <FontAwesome name="map-marker" size={16} color="#ccc" />
+                      <Text style={styles.locationText}>Davao City</Text>
+                    </View>
+                    <Ionicons name="heart-outline" size={20} color="white" />
                   </View>
-                  <Ionicons name="heart-outline" size={20} color="white" />
-                </View>
-                <Image source={car.image} style={styles.carImage} />
-                <View style={styles.modelPriceContainer}>
-                  <Text style={styles.carModel}>{car.model}</Text>
-                  <Text style={styles.carPrice}>{car.price}</Text>
-                </View>
-                <View style={styles.carInfoRow}>
-                  <View style={styles.ratingContainer}>
-                    <Text style={styles.carRating}>⭐ {car.rating}</Text>
-                    <View style={styles.carLabelContainer}>
-                      <Text style={styles.carLabel}>USED</Text>
+                  <Image source={car.image} style={styles.carImage} />
+                  <View style={styles.modelPriceContainer}>
+                    <Text style={styles.carModel}>{car.model}</Text>
+                    <Text style={styles.carPrice}>{car.price}</Text>
+                  </View>
+                  <View style={styles.carInfoRow}>
+                    <View style={styles.ratingContainer}>
+                      <Text style={styles.carRating}>⭐ {car.rating}</Text>
+                      <View style={styles.carLabelContainer}>
+                        <Text style={styles.carLabel}>USED</Text>
+                      </View>
+                    </View>
+                    <View style={styles.seatsContainer}>
+                      <Ionicons name="car-seat" size={14} color="#ccc" />
+                      <Text style={styles.seatsText}>{car.seats} Seats</Text>
                     </View>
                   </View>
-                  <View style={styles.seatsContainer}>
-                    <Ionicons name="car-seat" size={14} color="#ccc" />
-                    <Text style={styles.seatsText}>{car.seats} Seats</Text>
-                  </View>
                 </View>
-                {/* Buttons */}
-                <View style={styles.buttonsContainer}>
-                  <TouchableOpacity style={[styles.button, styles.detailsButton]} onPress={handleViewInfo}>
-                    <Text style={styles.detailsButtonText}>View Info</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.button, styles.rentNowButton]} onPress={handleViewInfo}>
-                    <Text style={styles.rentNowButtonText}>Rent Now</Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity 
+                  style={styles.arrowButton} 
+                  onPress={() => handleViewInfo(car)}
+                >
+                  <Ionicons name="arrow-forward" size={20} color="#fff" />
+                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -440,8 +452,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 12,
     marginBottom: 16,
-    height: 340, // Increased height
-    justifyContent: 'space-between', // This helps distribute content evenly
+    height: 280, // Reduced from 340 to 280
+    position: 'relative',
+  },
+  cardContent: {
+    flex: 1,
+    marginBottom: 12,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -460,21 +476,27 @@ const styles = StyleSheet.create({
   },
   carImage: {
     width: '100%',
-    height: 120,
+    height: 100, // Reduced from 120 to 100 to maintain proportions
     resizeMode: 'contain',
     marginVertical: 8,
   },
+  modelPriceContainer: {
+    flexDirection: 'row', // Changed to row
+    justifyContent: 'space-between', // Space between name and price
+    alignItems: 'center', // Center items vertically
+    marginBottom: 4,
+  },
   carModel: {
     color: 'white',
-    fontSize: 14, // Slightly reduced font size
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 4,
+    flex: 1, // Take available space
+    marginRight: 8, // Add space between model and price
   },
   carPrice: {
     color: '#FFB700',
-    fontSize: 18, // Increased from 14 to 18
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 4,
   },
   carRating: {
     color: '#ccc',
@@ -515,37 +537,17 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
-    marginTop: 'auto', // This pushes the buttons to the bottom
+    marginTop: 'auto',
     paddingTop: 8,
   },
   button: {
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    flex: 1,
-  },
-  detailsButton: {
-    backgroundColor: 'transparent',
-    borderColor: '#ffffff',
-    borderWidth: 1,
+    alignItems: 'center', // Center the arrow icon
   },
   rentNowButton: {
     backgroundColor: '#FFB700',
-  },
-  detailsButtonText: {
-    color: '#ffffff',
-    fontWeight: '600',
-    textAlign: 'center',
-    fontSize: 12,
-  },
-  rentNowButtonText: {
-    color: '#ffffff',
-    fontWeight: '600',
-    textAlign: 'center',
-    fontSize: 12,
   },
   indicatorContainer: {
     position: 'absolute',
@@ -587,6 +589,19 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     color: '#333',
+  },
+  arrowButton: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    width: 32,
+    height: 32,
+    backgroundColor: '#FFB700',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+    marginTop: 8, // Added top margin
   },
 });
 

@@ -1,29 +1,100 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 
 const RegisterScreen: React.FC = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    username: '',
+  });
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    username: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleRegister = () => {
-    if (!email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields.');
-      return;
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      email: '',
+      password: '',
+      confirmPassword: '',
+      username: '',
+    };
+
+    // Username validation
+    if (!formData.username) {
+      newErrors.username = 'Username is required';
+      isValid = false;
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+      isValid = false;
     }
 
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match.');
-      return;
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      isValid = false;
     }
 
-    // Simulate successful registration
-    console.log('Registered:', { email, password });
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+      isValid = false;
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+      isValid = false;
+    } else if (!/(?=.*[0-9])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one number';
+      isValid = false;
+    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+      isValid = false;
+    }
 
-    // Navigate back to login screen
-    router.replace('/login'); // Use replace so they can't "go back" to register
+    // Confirm password validation
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleRegister = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      if (validateForm()) {
+        // Add loading state
+        setTimeout(() => {
+          // Simulating API call
+          console.log('Registering with:', formData);
+          router.replace('/login');
+        }, 1500);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Registration failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -31,35 +102,65 @@ const RegisterScreen: React.FC = () => {
       <Text style={styles.title}>Create Account</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, errors.username && styles.inputError]}
+        placeholder="Username"
+        placeholderTextColor="#aaa"
+        value={formData.username}
+        onChangeText={(text) => {
+          setFormData(prev => ({ ...prev, username: text }));
+          setErrors(prev => ({ ...prev, username: '' }));
+        }}
+      />
+      {errors.username ? <Text style={styles.errorText}>{errors.username}</Text> : null}
+
+      <TextInput
+        style={[styles.input, errors.email && styles.inputError]}
         placeholder="Email"
         placeholderTextColor="#aaa"
         keyboardType="email-address"
         autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
+        value={formData.email}
+        onChangeText={(text) => {
+          setFormData(prev => ({ ...prev, email: text }));
+          setErrors(prev => ({ ...prev, email: '' }));
+        }}
       />
+      {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, errors.password && styles.inputError]}
         placeholder="Password"
         placeholderTextColor="#aaa"
         secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        value={formData.password}
+        onChangeText={(text) => {
+          setFormData(prev => ({ ...prev, password: text }));
+          setErrors(prev => ({ ...prev, password: '' }));
+        }}
       />
+      {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, errors.confirmPassword && styles.inputError]}
         placeholder="Confirm Password"
         placeholderTextColor="#aaa"
         secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
+        value={formData.confirmPassword}
+        onChangeText={(text) => {
+          setFormData(prev => ({ ...prev, confirmPassword: text }));
+          setErrors(prev => ({ ...prev, confirmPassword: '' }));
+        }}
       />
+      {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
+      <TouchableOpacity 
+        style={[styles.button, isSubmitting && styles.buttonDisabled]} 
+        onPress={handleRegister}
+        disabled={isSubmitting}
+      >
+        <Text style={styles.buttonText}>
+          {isSubmitting ? 'Creating Account...' : 'Register'}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.replace('/login')}>
@@ -74,7 +175,7 @@ export default RegisterScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#1054CF', // Changed from '#4A90E2'
     padding: 20,
     justifyContent: 'center',
   },
@@ -86,21 +187,35 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Translucent white
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    borderRadius: 25, // More rounded corners
     padding: 15,
     marginBottom: 15,
     fontSize: 16,
+    color: '#ffffff', // Make text white
+  },
+  inputError: {
+    borderColor: '#FF0000', // Red border for error
+  },
+  errorText: {
+    color: '#FF0000', // Red text for error messages
+    fontSize: 12,
+    marginBottom: 10,
   },
   button: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#FFB700',
+    borderRadius: 25, // Increased from 8
     paddingVertical: 15,
     alignItems: 'center',
     marginBottom: 20,
   },
+  buttonDisabled: {
+    backgroundColor: '#FFD580', // Lighter shade for disabled button
+  },
   buttonText: {
-    color: '#4A90E2',
+    color: '#FFFFFF', // Changed to white for better contrast
     fontSize: 16,
     fontWeight: 'bold',
   },

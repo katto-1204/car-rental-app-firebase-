@@ -74,8 +74,9 @@ const styles = StyleSheet.create({
   tabBar: {
     position: 'absolute',
     bottom: 20,
-    left: 20,
-    right: 20,
+    left: '50%',
+    transform: [{ translateX: -150 }], // Half of the width (300/2)
+    width: 300, // Fixed width for the tab bar
     height: 70,
     borderRadius: 30,
     backgroundColor: '#1054CF',

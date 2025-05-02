@@ -1,33 +1,100 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Dimensions,
+  Image,
+  Animated 
+} from 'react-native';
 import { useRouter } from 'expo-router';
+import Swiper from 'react-native-swiper';
+import { Ionicons } from '@expo/vector-icons';
+
+const { width, height } = Dimensions.get('window');
 
 const WelcomeScreen: React.FC = () => {
   const router = useRouter();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logoText}>CAR RENTAL</Text>
+      <Swiper
+        loop={false}
+        showsPagination={false} // Disable default pagination
+        style={styles.wrapper}
+        onIndexChanged={(index) => setCurrentIndex(index)}
+      >
+        <View style={styles.slide}>
+          <Ionicons name="car-sport" size={80} color="#FFB700" />
+          <Text style={styles.logoText}>RENTO</Text>
+          <Text style={styles.title}>Find Your Perfect Ride</Text>
+          <Text style={styles.description}>Browse through our extensive collection of vehicles</Text>
+          <View style={styles.featureContainer}>
+            <FeatureItem icon="search" text="Search Cars" />
+            <FeatureItem icon="filter" text="Filter Options" />
+            <FeatureItem icon="location" text="Nearby Cars" />
+          </View>
+        </View>
 
-      <Text style={styles.title}>Welcome to Car Rental App</Text>
+        <View style={styles.slide}>
+          <Ionicons name="calendar" size={80} color="#FFB700" />
+          <Text style={styles.logoText}>QUICK BOOKING</Text>
+          <Text style={styles.title}>Book in Minutes</Text>
+          <Text style={styles.description}>Simple and fast booking process with secure payments</Text>
+          <View style={styles.featureContainer}>
+            <FeatureItem icon="time" text="Quick Process" />
+            <FeatureItem icon="card" text="Secure Payment" />
+            <FeatureItem icon="shield-checkmark" text="Verified Cars" />
+          </View>
+        </View>
 
-      <TouchableOpacity style={styles.button} onPress={() => router.push('/login')}>
-        <Text style={styles.buttonText}>Get Started</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => router.push('/register')}>
-        <Text style={styles.registerText}>Don't have an account? Register</Text>
-      </TouchableOpacity>
+        <View style={styles.slide}>
+          <Ionicons name="key" size={80} color="#FFB700" />
+          <Text style={styles.logoText}>RENT A CAR?</Text>
+          <Text style={styles.title}>Start Your Journey</Text>
+          <Text style={styles.description}>Your adventure begins here</Text>
+          <TouchableOpacity 
+            style={[styles.button, { backgroundColor: '#FFB700' }]} 
+            onPress={() => router.push('/login')}
+          >
+            <Text style={[styles.buttonText, { color: '#fff' }]}>Get Started</Text>
+          </TouchableOpacity>
+        </View>
+      </Swiper>
+      
+      {/* Single progress indicator */}
+      <View style={styles.progressContainer}>
+        {[0, 1, 2].map((index) => (
+          <View
+            key={index}
+            style={[
+              styles.progressDot,
+              currentIndex === index && styles.activeProgressDot
+            ]}
+          />
+        ))}
+      </View>
     </View>
   );
 };
 
-export default WelcomeScreen;
+const FeatureItem = ({ icon, text }) => (
+  <View style={styles.featureItem}>
+    <Ionicons name={icon} size={24} color="#FFB700" />
+    <Text style={styles.featureText}>{text}</Text>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#1054CF',
+  },
+  wrapper: {},
+  slide: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -36,30 +103,68 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     color: '#fff',
-    fontWeight: '500',
-    marginBottom: 60,
+    fontWeight: '600',
+    marginBottom: 15,
     textAlign: 'center',
   },
+  description: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
   button: {
-    backgroundColor: '#fff',
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 30,
-    marginBottom: 20,
+    marginTop: 20,
+    elevation: 3,
   },
   buttonText: {
-    color: '#4A90E2',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  registerText: {
+  progressContainer: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    gap: 8,
+  },
+  progressDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  activeProgressDot: {
+    width: 24,
+    backgroundColor: '#FFB700',
+  },
+  featureContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 30,
+  },
+  featureItem: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    padding: 15,
+    borderRadius: 12,
+    width: width * 0.25,
+  },
+  featureText: {
     color: '#fff',
-    fontSize: 14,
-    textDecorationLine: 'underline',
+    marginTop: 8,
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
+
+export default WelcomeScreen;
